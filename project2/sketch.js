@@ -83,7 +83,7 @@ function setup() {
   fft = new p5.FFT(0.85, 256);
 
   textAlign(CENTER, CENTER);
-}
+
   // Home button
   homeBtn = createButton("Home");
   homeBtn.position(20, 20);
@@ -158,7 +158,6 @@ function draw() {
     endShape();
   }
 
-
   stroke(255, 80);
   strokeWeight(3);
   line(80, 70, 80, height - 70);
@@ -197,7 +196,6 @@ function draw() {
   text("A S D F G H J K = notes", width / 2, 78);
   text("You can press multiple keys at once", width / 2, 102);
 
-
   text("Active notes: " + activeCount, width / 2, height - 42);
 }
 
@@ -211,22 +209,18 @@ function keyPressed() {
   v.held = true;
   v.active = true;
 
-  // smoother violin-ish tone
   v.osc1.freq(v.freq);
   v.osc2.freq(v.freq * 2);
 
   if (sustainMode) {
-    // long sustained note while key is down
     v.osc1.amp(0.13, 0.12);
     v.osc2.amp(0.06, 0.12);
     v.noise.amp(0.012, 0.12);
   } else {
-    // short note if is not held
     v.osc1.amp(0.14, 0.03);
     v.osc2.amp(0.06, 0.03);
     v.noise.amp(0.01, 0.03);
 
-    // automatic short release
     setTimeout(() => {
       if (!sustainMode && !v.held) {
         releaseVoice(k, 0.2);
@@ -261,7 +255,6 @@ function mousePressed() {
 function mouseReleased() {
   sustainMode = false;
 
-  // release all keys that are no longer held
   for (let k of keyOrder) {
     if (!voices[k].held) {
       releaseVoice(k, 0.25);
@@ -281,6 +274,7 @@ function releaseVoice(k, releaseTime) {
     }
   }, releaseTime * 1000 + 30);
 }
+
 function goHome() {
   window.location.href = "index.html";
 }
