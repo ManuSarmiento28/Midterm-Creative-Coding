@@ -8,11 +8,12 @@ let stepDuration = 0;
 let lastStepTime = 0;
 let isPlaying = false;
 
-let cellSize = 38;
+let cellSize = 40;
 let startX = 0;
 let startY = 0;
 let gridW = 0;
 let gridH = 0;
+let labelWidth = 120;
 
 let homeBtn, playBtn, clearBtn, randomBtn, bpmSlider;
 
@@ -39,6 +40,7 @@ function setup() {
 
 function draw() {
   background(18);
+
   bpm = bpmSlider.value();
   updateStepDuration();
 
@@ -47,8 +49,7 @@ function draw() {
     lastStepTime = millis();
   }
 
-  updateLayout();
-  drawUI();
+  drawTitle();
   drawGrid();
 }
 
@@ -72,6 +73,8 @@ function createUI() {
   styleButton(playBtn);
   styleButton(clearBtn);
   styleButton(randomBtn);
+
+  positionControls();
 }
 
 function styleButton(btn) {
@@ -84,95 +87,91 @@ function styleButton(btn) {
   btn.style("font-size", "14px");
 }
 
+function positionControls() {
+  let topY = 30;
+  let controlsStartX = width / 2 - 250;
+
+  homeBtn.position(controlsStartX, topY);
+  playBtn.position(controlsStartX + 80, topY);
+  clearBtn.position(controlsStartX + 200, topY);
+  randomBtn.position(controlsStartX + 280, topY);
+  bpmSlider.position(controlsStartX + 380, topY + 5);
+}
+
 function updateLayout() {
   gridW = steps * cellSize;
   gridH = tracks.length * cellSize;
 
-  let labelArea = 120;
-  let topArea = 90;
+  // center the whole sequencer block:
+  // labels + grid together
+  let totalSequencerWidth = labelWidth + gridW;
+  startX = (width - totalSequencerWidth) / 2 + labelWidth;
+  startY = (height - gridH) / 2;
 
-  startX = (width - gridW) / 2 + labelArea / 2;
-  startY = (height - gridH) / 2 + topArea / 2;
-
-  let controlsY = startY - 60;
-  let totalControlsWidth = 520;
-  let controlsStartX = (width - totalControlsWidth) / 2;
-
-  homeBtn.position(controlsStartX, controlsY);
-  playBtn.position(controlsStartX + 70, controlsY);
-  clearBtn.position(controlsStartX + 180, controlsY);
-  randomBtn.position(controlsStartX + 250, controlsY);
-  bpmSlider.position(controlsStartX + 340, controlsY + 4);
+  positionControls();
 }
 
-function drawUI() {
+function drawTitle() {
   fill(255);
   noStroke();
   textAlign(CENTER, CENTER);
 
   textSize(28);
-  text("DRUM SEQUENCER", width / 2, startY - 105);
+  text("DRUM SEQUENCER", width / 2, startY - 90);
 
-  textSize(16);
-  text("Click a square to change its volume", width / 2, startY - 82);
+  textSize(15);
+  fill(200);
+  text("Click each square to cycle volume: 0 → 1 → 2 → 3 → 0", width / 2, startY - 60);
 
-  textSize(14);
-  text("1 = low   2 = medium   3 = high   4th click = off", width / 2, startY - 62);
-
+  fill(255);
   textAlign(LEFT, CENTER);
   text("BPM: " + bpm, bpmSlider.x + 190, bpmSlider.y + 8);
 }
 
 function drawGrid() {
+  // track labels
   for (let i = 0; i < tracks.length; i++) {
     fill(255);
     noStroke();
     textSize(15);
     textAlign(RIGHT, CENTER);
-    text(tracks[i], startX - 18, startY + i * cellSize + cellSize / 2 - 2);
+    text(tracks[i], startX - 16, startY + i * cellSize + cellSize / 2);
   }
 
+  // step numbers
   for (let j = 0; j < steps; j++) {
-    fill(200);
+    fill(180);
     noStroke();
     textSize(12);
     textAlign(CENTER, CENTER);
-    text(j + 1, startX + j * cellSize + cellSize / 2 - 2, startY - 20);
+    text(j + 1, startX + j * cellSize + cellSize / 2 - 2, startY - 18);
   }
 
+  // cells
   for (let i = 0; i < tracks.length; i++) {
     for (let j = 0; j < steps; j++) {
       let x = startX + j * cellSize;
       let y = startY + i * cellSize;
       let level = pattern[i][j];
 
-      if (j === currentStep && isPlaying) {
-        if (level === 0) {
-          fill(255, 220, 120);
-        } else if (level === 1) {
-          fill(80, 200, 255);
-        } else if (level === 2) {
-          fill(0, 170, 255);
-        } else {
-          fill(0, 120, 255);
-        }
-      } else {
-        if (level === 0) {
-          fill(55);
-        } else if (level === 1) {
-          fill(90, 170, 255);
-        } else if (level === 2) {
-          fill(30, 140, 255);
-        } else {
-          fill(0, 95, 230);
-        }
+      if (level === 0) {
+        fill(50);
+      } else if (level === 1) {
+        fill(90, 170, 255);
+      } else if (level === 2) {
+        fill(255, 180, 70);
+      } else if (level === 3) {
+        fill(255, 80, 80);
       }
 
-      if (j % 4 === 0) {
-        stroke(180);
+      if (j === currentStep && isPlaying) {
+        stroke(255);
+        strokeWeight(3);
+      } else if (j % 4 === 0) {
+        stroke(160);
         strokeWeight(1.5);
       } else {
-        stroke(100);
+        stroke(95);
         strokeWeight(1);
       }
 
@@ -181,8 +180,8 @@ function drawGrid() {
       if (level > 0) {
         noStroke();
         fill(255);
-        textSize(12);
         textAlign(CENTER, CENTER);
+        textSize(15);
         text(level, x + (cellSize - 4) / 2, y + (cellSize - 4) / 2 + 1);
       }
     }
@@ -204,6 +203,7 @@ function mousePressed() {
         mouseY < y + cellSize - 4
       ) {
         pattern[i][j] = (pattern[i][j] + 1) % 4;
+        return;
       }
     }
   }
@@ -226,11 +226,11 @@ function randomPattern() {
   for (let i = 0; i < tracks.length; i++) {
     for (let j = 0; j < steps; j++) {
       let chance = random();
-      if (chance < 0.68) {
+      if (chance < 0.65) {
         pattern[i][j] = 0;
-      } else if (chance < 0.82) {
+      } else if (chance < 0.8) {
         pattern[i][j] = 1;
-      } else if (chance < 0.93) {
+      } else if (chance < 0.92) {
         pattern[i][j] = 2;
       } else {
         pattern[i][j] = 3;
@@ -297,21 +297,18 @@ function levelAmp(level, low, mid, high) {
 }
 
 function playKick(level) {
-  let amp = levelAmp(level, 0.35, 0.6, 0.9);
-
+  let amp = levelAmp(level, 0.22, 0.5, 0.95);
   kickOsc.freq(140);
   kickOsc.amp(amp, 0.005);
-
   setTimeout(() => kickOsc.freq(80), 20);
   setTimeout(() => kickOsc.freq(50), 50);
   setTimeout(() => kickOsc.amp(0, 0.12), 60);
 }
 
 function playSnare(level) {
-  let amp = levelAmp(level, 0.25, 0.5, 0.75);
+  let amp = levelAmp(level, 0.18, 0.42, 0.8);
 
   snareNoise.disconnect();
-
   let filter = new p5.BandPass();
   snareNoise.connect(filter);
   filter.freq(1800);
@@ -322,39 +319,41 @@ function playSnare(level) {
 }
 
 function playClosedHat(level) {
-  let amp = levelAmp(level, 0.12, 0.23, 0.35);
+  let amp = levelAmp(level, 0.08, 0.18, 0.34);
 
   hatNoise.disconnect();
   let filter = new p5.HighPass();
   hatNoise.connect(filter);
   filter.freq(7000);
+
   hatNoise.amp(amp, 0.001);
   hatNoise.amp(0, 0.04);
 }
 
 function playOpenHat(level) {
-  let amp = levelAmp(level, 0.12, 0.22, 0.3);
+  let amp = levelAmp(level, 0.08, 0.17, 0.3);
 
   openHatNoise.disconnect();
   let filter = new p5.HighPass();
   openHatNoise.connect(filter);
   filter.freq(5000);
+
   openHatNoise.amp(amp, 0.001);
   openHatNoise.amp(0, 0.22);
 }
 
 function playClap(level) {
-  let amp1 = levelAmp(level, 0.2, 0.38, 0.55);
-  let amp2 = levelAmp(level, 0.15, 0.3, 0.45);
-  let amp3 = levelAmp(level, 0.1, 0.2, 0.3);
+  let amp1 = levelAmp(level, 0.14, 0.28, 0.5);
+  let amp2 = levelAmp(level, 0.1, 0.22, 0.38);
+  let amp3 = levelAmp(level, 0.06, 0.15, 0.26);
 
   clapNoise.disconnect();
   let filter = new p5.BandPass();
   clapNoise.connect(filter);
   filter.freq(2500);
   filter.res(2);
-  clapNoise.amp(amp1, 0.001);
 
+  clapNoise.amp(amp1, 0.001);
   setTimeout(() => clapNoise.amp(0, 0.03), 10);
   setTimeout(() => clapNoise.amp(amp2, 0.001), 25);
   setTimeout(() => clapNoise.amp(0, 0.03), 45);
@@ -363,8 +362,7 @@ function playClap(level) {
 }
 
 function playTom(level) {
-  let amp = levelAmp(level, 0.25, 0.48, 0.7);
-
+  let amp = levelAmp(level, 0.18, 0.4, 0.72);
   tomOsc.freq(220);
   tomOsc.amp(amp, 0.005);
   setTimeout(() => tomOsc.freq(170), 25);
