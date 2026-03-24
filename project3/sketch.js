@@ -380,8 +380,3 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   updateLayout();
 }
-}
-
-function windowResized() {
-resizeCanvas(windowWidth, windowHeight);
-}
