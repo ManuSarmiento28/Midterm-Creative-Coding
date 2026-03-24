@@ -276,7 +276,7 @@ function releaseVoice(k, releaseTime) {
 }
 
 function goHome() {
-  window.location.href = "index.html";
+  window.location.href = "../index.html";
 }
 
 function windowResized() {
