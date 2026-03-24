@@ -121,7 +121,7 @@ function drawTitle() {
 
   textSize(15);
   fill(200);
-  text("Click each square to cycle volume: 0 → 1 → 2 → 3 → 0", width / 2, startY - 60);
+  text("Click each square to cycle volume: 0 to 1 to 2 to 3 to 0", width / 2, startY - 60);
 
   fill(255);
   textAlign(LEFT, CENTER);
@@ -183,10 +183,7 @@ function drawGrid() {
         textAlign(CENTER, CENTER);
         textSize(15);
         text(level, x + (cellSize - 4) / 2, y + (cellSize - 4) / 2 + 1);
-      }
-    }
-  }
-}
+      }}}}
 
 function mousePressed() {
   userStartAudio();
@@ -204,10 +201,7 @@ function mousePressed() {
       ) {
         pattern[i][j] = (pattern[i][j] + 1) % 4;
         return;
-      }
-    }
-  }
-}
+      }}}}
 
 function togglePlay() {
   userStartAudio();
@@ -218,9 +212,7 @@ function clearPattern() {
   for (let i = 0; i < tracks.length; i++) {
     for (let j = 0; j < steps; j++) {
       pattern[i][j] = 0;
-    }
-  }
-}
+    }}}
 
 function randomPattern() {
   for (let i = 0; i < tracks.length; i++) {
@@ -235,9 +227,7 @@ function randomPattern() {
       } else {
         pattern[i][j] = 3;
       }
-    }
-  }
-}
+    }}}
 
 function updateStepDuration() {
   stepDuration = (60 / bpm / 4) * 1000;
@@ -251,9 +241,7 @@ function advanceStep() {
     let level = pattern[i][currentStep];
     if (level > 0) {
       playDrum(i, level);
-    }
-  }
-}
+    }}}
 
 function createDrums() {
   kickOsc = new p5.Oscillator("sine");
