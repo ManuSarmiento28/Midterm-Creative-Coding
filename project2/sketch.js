@@ -16,6 +16,7 @@ let sustainMode = false;
 
 let stringWaves = [];
 let keyOrder = Object.keys(notes);
+let homeBtn;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -82,6 +83,19 @@ function setup() {
   fft = new p5.FFT(0.85, 256);
 
   textAlign(CENTER, CENTER);
+}
+  // Home button
+  homeBtn = createButton("Home");
+  homeBtn.position(20, 20);
+  homeBtn.style("padding", "8px 15px");
+  homeBtn.style("background", "rgba(120, 80, 255, 0.85)");
+  homeBtn.style("color", "white");
+  homeBtn.style("border", "none");
+  homeBtn.style("border-radius", "20px");
+  homeBtn.style("cursor", "pointer");
+  homeBtn.style("font-size", "14px");
+  homeBtn.style("z-index", "10");
+  homeBtn.mousePressed(goHome);
 }
 
 function draw() {
@@ -266,6 +280,9 @@ function releaseVoice(k, releaseTime) {
       v.active = false;
     }
   }, releaseTime * 1000 + 30);
+}
+function goHome() {
+  window.location.href = "index.html";
 }
 
 function windowResized() {
